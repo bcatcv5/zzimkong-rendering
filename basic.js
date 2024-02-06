@@ -1,7 +1,7 @@
 import * as THREE from "./build/three.module.js"
-import { OrbitControls } from "../examples/jsm/controls/OrbitControls.js"
-import { PLYLoader } from "../examples/jsm/loaders/PLYLoader.js"
-import Stats from "../examples/jsm/libs/stats.module.js"
+import { OrbitControls } from "./examples/jsm/controls/OrbitControls.js"
+import { PLYLoader } from "./examples/jsm/loaders/PLYLoader.js"
+import Stats from "./examples/jsm/libs/stats.module.js"
 
 class App
 {
