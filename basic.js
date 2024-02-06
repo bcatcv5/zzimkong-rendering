@@ -10,7 +10,7 @@ class App
         const divContainer = document.querySelector("#webgl-container");
         this._divContainer = divContainer
 
-        const renderer = new THREE.WebGLRenderer({antialias: true});
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         this._renderer = renderer
         divContainer.appendChild(renderer.domElement)
@@ -83,19 +83,21 @@ class App
     {   
         const plyLoader = new PLYLoader();
             plyLoader.load(
-                "./assets/neucon_demodata_b5f1.ply",
+                "./assets/360_room_coarse.ply",
                 (geometry) => {
                     geometry.computeVertexNormals();
-                    const material = new THREE.MeshLambertMaterial({
-                        color: 0x997777,
-                        emissive: 0x00000,
-                        wireframe: false
-                    });
-
+                    // const material = new THREE.MeshLambertMaterial({
+                    //     color: 0x997777,
+                    //     emissive: 0x00000,
+                    //     wireframe: false
+                    // });
+                    const material = new THREE.PointsMaterial( { size: 0.1, vertexColors: true } );
+                    material.side = THREE.DoubleSide
+                    // const object = new THREE.Points( geometry, material );
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.rotateX(-Math.PI / 2);
                     mesh.scale.multiplyScalar(2.5);
-                    mesh.position.x = -10.0;
+                    mesh.position.x = 0.0;
                     mesh.position.y = 0.0;
                     mesh.castShadow = true;
                     mesh.receiveShadow = true;
