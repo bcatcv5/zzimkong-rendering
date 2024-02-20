@@ -16,7 +16,7 @@ class App
         divContainer.appendChild(renderer.domElement)
 
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0x72645b );
+        scene.background = new THREE.Color(0x72645b);
         this._scene = scene;
 
         this._setupCamera();
@@ -47,10 +47,9 @@ class App
     render(time)
     {
         this._renderer.render(this._scene, this._camera);
-        //this._updateModel(time);
         this._stats.update();
-        console.log(this._camera.position);
         requestAnimationFrame(this.render.bind(this));
+        // console.log(this._camera.position);
     }
     
     _setupControls()
@@ -63,9 +62,9 @@ class App
     {
         const width = this._divContainer.clientWidth;
         const height = this._divContainer.clientHeight;
-        const camera = new THREE.PerspectiveCamera(60, width / height, 0.0001, 300);
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.0001, 300);
 
-        camera.position.set(0, 20, 10)
+        camera.position.set(10, 10, 10)
         this._camera = camera;
     }
 
@@ -83,34 +82,33 @@ class App
     {   
         const plyLoader = new PLYLoader();
             plyLoader.load(
-                "./assets/360_room_coarse.ply",
+                "./assets/chj.ply",
                 (geometry) => {
                     geometry.computeVertexNormals();
-                    // const material = new THREE.MeshLambertMaterial({
-                    //     color: 0x997777,
-                    //     emissive: 0x00000,
-                    //     wireframe: false
-                    // });
-                    const material = new THREE.PointsMaterial( { size: 0.1, vertexColors: true } );
-                    material.side = THREE.DoubleSide
-                    // const object = new THREE.Points( geometry, material );
-                    const mesh = new THREE.Mesh(geometry, material);
-                    mesh.rotateX(-Math.PI / 2);
-                    mesh.scale.multiplyScalar(2.5);
-                    mesh.position.x = 0.0;
-                    mesh.position.y = 0.0;
-                    mesh.castShadow = true;
-                    mesh.receiveShadow = true;
-                    
-                    this._mesh = mesh;
-                    this._scene.add(this._mesh);
-                    // const axesHelper = new THREE.AxesHelper(30)
-                    // this._scene.add(axesHelper);
-                    // const boundingBox = new THREE.Box3();
-                    // const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
-                    // this._scene.add(boxHelper);
-                    // boundingBox.setFromObject(this._mesh);
-                    // boxHelper.setFromObject(this._mesh);
+                    let material;
+                    if (geometry.index !== null)
+                    {
+                        console.log(geometry.attributes.color);
+                        if (geometry.attributes.color !== undefined)
+                        {
+                            material = new THREE.PointsMaterial( { size: 0.05, vertexColors: true } );
+                        }
+                        else
+                        {
+                            material = new THREE.MeshLambertMaterial({color: 0x997777, emissive: 0x00000, wireframe: false});
+                        }
+                        const mesh = new THREE.Mesh(geometry, material);
+                        this._processMesh(mesh);
+                        this._setupHelper();
+                        this._setMeshPosition();
+                    } 
+                    else
+                    {
+                        material = new THREE.PointsMaterial({ size: 0.02, vertexColors: true });
+                        const points = new THREE.Points(geometry, material);
+                        this._processPointCloud(points);
+                        this._setupHelper();
+                    }
                 },
                 (xhr) => {
                     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -119,8 +117,56 @@ class App
                     console.log(error);
                 }
         );
-        
     }
+
+    _debug()
+    {
+        this._scene.add(this._axesHelper);
+        this._scene.add(this._boxHelper);
+    }
+
+    _setupHelper()
+    {
+        const axesHelper = new THREE.AxesHelper(30)
+        const boundingBox = new THREE.Box3();
+        const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
+        this._boundingBox = boundingBox;
+        this._axesHelper = axesHelper;
+        this._boxHelper = boxHelper;
+        boundingBox.setFromObject(this._mesh);
+    }
+
+    _setMeshPosition()
+    {
+        this._mesh.position.x = -(this._boundingBox.min.x + this._boundingBox.max.x) / 2;
+        this._mesh.position.y = 0;
+        this._mesh.position.z = -(this._boundingBox.min.z + this._boundingBox.max.z) / 2;
+        this._boundingBox.setFromObject(this._mesh);
+        const value = (this._boundingBox.max.x ** 2 + this._boundingBox.max.y ** 2 + this._boundingBox.max.z ** 2) ** 0.5
+        this._camera.position.set(value / 2, value / 2, value / 2)
+    }
+
+    _processMesh(mesh)
+    {
+        mesh.rotateX(-Math.PI / 2);
+        mesh.scale.multiplyScalar(5);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        
+        this._mesh = mesh;
+        this._scene.add(this._mesh);
+    }
+
+    _processPointCloud(points)
+    {
+        points.rotateX(-Math.PI / 2);
+        points.scale.multiplyScalar(5);
+        
+        this._mesh = points;
+        this._scene.add(this._mesh);
+    }
+
+
 }
 
 window.onload = function()
