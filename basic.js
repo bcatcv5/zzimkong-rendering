@@ -62,9 +62,9 @@ class App
     {
         const width = this._divContainer.clientWidth;
         const height = this._divContainer.clientHeight;
-        const camera = new THREE.PerspectiveCamera(75, width / height, 0.0001, 300);
+        const camera = new THREE.PerspectiveCamera(75, width / height, 1, 500);
 
-        camera.position.set(10, 10, 10)
+        camera.position.set(5, 10, 5)
         this._camera = camera;
     }
 
@@ -88,7 +88,6 @@ class App
                     let material;
                     if (geometry.index !== null)
                     {
-                        console.log(geometry.attributes.color);
                         if (geometry.attributes.color !== undefined)
                         {
                             material = new THREE.PointsMaterial( { size: 0.05, vertexColors: true } );
@@ -101,10 +100,11 @@ class App
                         this._processMesh(mesh);
                         this._setupHelper();
                         this._setMeshPosition();
+                        this._debug();
                     } 
                     else
                     {
-                        material = new THREE.PointsMaterial({ size: 0.02, vertexColors: true });
+                        material = new THREE.PointsMaterial({ size: 0.03   , vertexColors: true });
                         const points = new THREE.Points(geometry, material);
                         this._processPointCloud(points);
                         this._setupHelper();
@@ -149,7 +149,7 @@ class App
     _processMesh(mesh)
     {
         mesh.rotateX(-Math.PI / 2);
-        mesh.scale.multiplyScalar(5);
+        mesh.scale.multiplyScalar(10);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         
@@ -160,7 +160,7 @@ class App
     _processPointCloud(points)
     {
         points.rotateX(-Math.PI / 2);
-        points.scale.multiplyScalar(5);
+        points.scale.multiplyScalar(10);
         
         this._mesh = points;
         this._scene.add(this._mesh);
