@@ -1,0 +1,7 @@
+{
+  "name": "Design Interior",
+  "short_name": "Interior",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone"
+}
